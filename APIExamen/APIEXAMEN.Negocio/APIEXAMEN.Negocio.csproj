@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\APIEXAMEN.DATOS\APIEXAMEN.DATOS.csproj" />
+    <ProjectReference Include="..\APIEXAMEN.Entidades\APIEXAMEN.Entidades.csproj" />
+    <ProjectReference Include="..\APIEXAMEN.Herramientas\APIEXAMEN.Herramientas.csproj" />
+    <ProjectReference Include="..\APIEXAMEN.Modelos\APIEXAMEN.Modelos.csproj" />
+  </ItemGroup>
+
+</Project>

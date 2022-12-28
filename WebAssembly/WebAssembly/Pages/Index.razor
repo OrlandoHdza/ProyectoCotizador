@@ -1,0 +1,332 @@
+﻿@using WebAssembly.Entidades.Catalogos;
+@using WebAssembly.Repositorio.CONTRATOS;
+@using WebAssembly.Entidades.CodigoPostal;
+
+@page "/"
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+
+<PageTitle>Index</PageTitle>
+
+<h2>Vehículo</h2>
+
+<div class="DivCombos">
+    <EditForm Model="@Model">
+        <InputSelect 
+            class="form-control"
+            Value="Model.Id" 
+            ValueChanged="@((int e) => SelectedMarcaChanged(e))"
+            ValueExpression="@(() => Model.Id)">
+            <option value="0">SELECCIONA UNA MARCA</option>
+            @foreach (var i in Marcas)
+            {
+                @if (i.Id == Model.Id)
+                {
+                    <option value="@i.Id">@i.Nombre</option>
+                }else
+                {
+                    <option value="@i.Id">@i.Nombre</option>
+                }
+            }
+        </InputSelect>
+    </EditForm>
+
+    <EditForm Model="@ModelSub" class="ComboSubMarca" >
+        <InputSelect
+        class="form-control"
+        Value="ModelSub.Id"
+        ValueChanged="@((int e) => SelectedSubMarcaChanged(e))"
+        ValueExpression="@(() => ModelSub.Id)"
+        >
+        <option value="0">SELECCIONA UNA SUBMARCA</option>
+            @foreach (var i in SubMarcas)
+            {
+                @if (i.Id == ModelSub.Id)
+                {
+                    <option value="@i.Id">@i.Nombre</option>
+                }
+                else
+                {
+                    <option value="@i.Id">@i.Nombre</option>
+                }
+            }
+        </InputSelect>
+    </EditForm>
+
+    <EditForm Model="@ModelAnio" class="ComboAnio" >
+        <InputSelect
+        class="form-control"
+        Value="ModelAnio.Id"
+        ValueChanged="@((int e) => SelectedModelosChanged(e))"
+        ValueExpression="@(() => ModelAnio.Id)"
+        >
+        <option value="0">SELECCIONA UN MODELO</option>
+            @foreach(var i in Anios)
+            {
+                @if (i.Id == ModelAnio.Id)
+                {
+                    <option value="@i.Id">@i.Anio</option>
+                }
+                else
+                {
+                    <option value="@i.Id">@i.Anio</option>
+                }
+            }
+
+        </InputSelect>
+    </EditForm>
+
+    <EditForm Model="@ModelDes" >
+        <InputSelect
+        class="form-control"
+        Value="ModelDes.Id"
+        ValueChanged="@((int e) => SelectedDescripcionesChanged(e))"
+        ValueExpression="@(() => ModelDes.Id)"
+        >
+        <option value="0">SELECCIONA UNA DESCRIPCION</option>
+        @foreach(var i in Descripciones)
+            {
+                if (i.Id == ModelDes.Id)
+                {
+                    <option value="@i.Id">@i.Descripcion</option>
+                }
+                else
+                {
+                   <option value="@i.Id">@i.Descripcion</option> 
+                }
+            }
+        </InputSelect>
+    </EditForm>
+
+    <div class="DivDomicilio">
+        <h2>Domicilio</h2>
+
+        <EditForm Model="ModelCP">
+            <InputText class="form-control" ValueExpression="@(() => ModelCP)" ValueChanged="@((string e) => Enter(e))" placeholder="Codigo Postal" />
+        </EditForm>
+
+        <EditForm Model="ModelMun">
+            <InputText @bind-Value="ModelMun.Estado" class="form-control DomicilioControl" disabled />
+            <InputText @bind-Value="ModelMun.Municipio" class="form-control DomicilioControl" disabled />
+        </EditForm>
+
+
+        <EditForm Model="ModelUbi" class="DomicilioControl">
+            <InputSelect class="form-control"
+                         Value="ModelUbi.IdUbicacion" ValueChanged="@((int e) => SelectedColoniaChanged(e))"
+                ValueExpression="@(() => ModelUbi.IdUbicacion)"  >
+                
+                <option value="0" >SELECCIONA UNA COLONIA</option>
+
+                @foreach (var i in Ubicaciones)
+                {
+                    @if (i.IdUbicacion == ModelUbi.IdUbicacion)
+                    {
+                        <option value="i.IdUbicacion">@i.Nombre</option>
+                    }
+                    else
+                    {
+                        <option value="i.IdUbicacion">@i.Nombre</option>
+                    }
+
+                }
+            </InputSelect>
+        </EditForm>
+    </div>
+
+    <div class="Cotizar">
+        <button class="btn btn-primary btn-lg" @onclick="OnClickCotizar">Cotizar</button>
+    </div>
+
+</div>
+
+<style>
+    .Cotizar{
+        margin-top: 20px;
+        align-items: center;
+        text-align:center;
+    }
+    .DomicilioControl {
+        margin-top: 20px;
+    }
+    .formEstado{
+        margin-top: 30px;
+    }
+    .DivDomicilio{
+        margin-top: 50px;
+    }
+    h2{
+        text-align: center;
+    }
+    .DivCombos{
+        margin-top: 50px;
+        margin-left: 400px;
+        margin-right: 400px;
+    }
+
+    .ComboSubMarca{
+        margin-top: 20px;
+        margin-bottom: 30px;
+    }
+    .ComboAnio{
+        margin-bottom: 30px;
+    }
+</style>
+
+
+@code
+{
+    ASSEMBLY GetASSEMBLY = new ASSEMBLY();
+
+    public List<Marca> Marcas = new List<Marca>();
+    public List<Submarca> SubMarcas = new List<Submarca>();
+    public List<Modelos> Anios = new List<Modelos>();
+    public List<Descripciones> Descripciones = new List<Descripciones>();
+    public List<Ubicacion> Ubicaciones = new List<Ubicacion>();
+
+    public Marca Model { get; set; } = new Marca();
+    public Submarca ModelSub { get; set; } = new Submarca();
+    public Modelos ModelAnio { get; set; } = new Modelos();
+    public Descripciones ModelDes { get; set; } = new Descripciones();
+    public Ubicacion ModelUbi { get; set; } = new Ubicacion();
+    public DatosUbicacion ModelMun { get; set; } = new DatosUbicacion();
+
+    public string ModelCP = string.Empty;
+
+    private string? InputValue { get; set; }
+
+    public int Id = 0;
+    public int IdSub = 0;
+    public int IdMod = 0;
+    public int IdDes = 0;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var test = await GetASSEMBLY.GetContenidoMarca();
+
+            foreach (var i in test)
+            {
+                Marcas.Add(i);
+            }
+        }
+        catch (Exception ex)
+        {
+            var error = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+        }
+    }
+
+    async void SelectedMarcaChanged(int e)
+    {
+        Model.Id = e;
+        //SE LLAMA EL ENDPOINT DE SUBMARCAS
+
+        var submarcaresultado = await GetASSEMBLY.GetSubMarca(Model.Id);
+
+        SubMarcas = new List<Submarca>();
+        Descripciones = new List<Descripciones>();
+        Anios = new List<Modelos>();
+
+        foreach (var i in submarcaresultado)
+        {
+            SubMarcas.Add(i);
+        }
+
+
+        StateHasChanged();
+    }
+
+
+    async void SelectedSubMarcaChanged(int e)
+    {
+        ModelSub.Id = e;
+        //SE LLAMA AL ENDPOINT MODRLOD
+
+        var modelosresultado = await GetASSEMBLY.GetModelos(ModelSub.Id);
+
+        Anios = new List<Modelos>();
+
+        Descripciones = new List<Descripciones>();
+        var TempList = new List<Modelos>();
+
+        foreach (var i in modelosresultado)
+        {
+            TempList.Add(i);
+        }
+
+        Anios = TempList.OrderBy(x => x.Anio).ToList();
+
+        StateHasChanged();
+    }
+
+    async void SelectedModelosChanged(int e)
+    {
+        ModelAnio.Id = e;
+
+        var descripcionesresultado = await GetASSEMBLY.GetDescripciones(ModelAnio.Id, ModelSub.Id);
+
+        Descripciones = new List<Descripciones>();
+
+        foreach (var i in descripcionesresultado)
+        {
+            Descripciones.Add(i);
+        }
+
+        StateHasChanged();
+    }
+
+    void SelectedDescripcionesChanged(int e)
+    {
+        ModelDes.Id = e;
+
+
+        StateHasChanged();
+    }
+
+    void SelectedColoniaChanged(int e)
+    {
+        ModelUbi.IdUbicacion = e;
+
+
+        StateHasChanged();
+    }
+
+    public async void Enter(string e)
+    {
+        if (!string.IsNullOrEmpty(e))
+        {
+            var resultado = await GetASSEMBLY.ConlsultarSepomex(e);
+
+            InputValue = resultado.Estado;
+
+            ModelMun = resultado;
+            Ubicaciones = resultado.Ubicaciones;
+
+            StateHasChanged();
+        }
+    }
+
+
+    public async void OnClickCotizar()
+    {
+        try
+        {
+            if (ModelDes.Id != 0 && ModelUbi.IdUbicacion != 0)
+            {
+                
+            }else
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Warning!");
+            }
+        }
+        catch (Exception)
+        {
+            
+            throw;
+        }
+    }
+
+
+}
